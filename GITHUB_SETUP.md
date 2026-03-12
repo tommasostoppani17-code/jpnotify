@@ -1,6 +1,6 @@
 # Setup GitHub: notifiche anche a PC spento
 
-**Le notifiche partono da GitHub**, non dal tuo computer. Puoi **chiudere Cursor**, **spegnere il PC** e le notifiche continuano lo stesso (08:00–23:00 ora italiana, ogni 5–10 min).
+**Le notifiche partono da GitHub**, non dal tuo computer. Puoi **chiudere Cursor**, **spegnere il PC** e le notifiche continuano (dalle **6:00** alle **2:00** ora italiana, ogni 5–10 min). Obiettivo: **8000 vocaboli** in blocchi da 50 con spaced repetition, così nel tempo copri tutte le parole.
 
 Segui questi passi una sola volta. Dopo, il workflow gira da solo ogni 5 minuti.
 
@@ -23,12 +23,12 @@ Segui questi passi una sola volta. Dopo, il workflow gira da solo ogni 5 minuti.
    Valore: il tuo topic ntfy (es. `mio_giapponese_extreme_8000` – quello che usi nell’app ntfy sull’iPhone).
 4. Salva.
 
-**Icona personalizzata (pagoda giapponese su iPhone/MacBook):**  
-Aggiungi un altro secret: nome `ICONA_NOTIFICA_URL`, valore:
+**Icona notifiche personalizzata:**  
+Aggiungi il secret `ICONA_NOTIFICA_URL` con l’**URL pubblico della tua immagine** (PNG/JPG). ntfy la userà per tutte le notifiche.  
+Esempi: URL raw di un’immagine su GitHub, link da Imgur o da un tuo sito. Se non lo imposti, si usa l’icona del repo (pagoda).
 ```
 https://raw.githubusercontent.com/tommasostoppani17-code/jpnotify/main/assets/icona_notifica.png
 ```
-Così ntfy userà questa icona al posto di quella grigia predefinita.
 
 ---
 
@@ -54,6 +54,6 @@ Sostituisci `TUO_USERNAME` e `TUO_REPO` con i tuoi (es. `mionome` e `spaced-repe
 3. Quando il run è finito (icona verde), apri il run e nella step **"Esegui main"** controlla l’exit code: `0` = notifica inviata, nessun output dopo = non era ancora ora (normale con lo schedule).
 4. Sul telefono/MacBook: apri l’app ntfy e iscriviti al **topic** uguale al valore che hai messo in `NTFY_TOPIC` (es. `mio_giapponese_extreme_8000`). Dovresti ricevere una notifica entro pochi secondi dal run con "Invia subito" attivo.
 
-Se non arriva nulla: controlla nel run la riga **"Topic ntfy impostato: si"** (se vedi **NO**, aggiungi il secret `NTFY_TOPIC`). Le notifiche automatiche partono ogni 5 min tra le 08:00 e le 23:00 (ora italiana).
+Se non arriva nulla: controlla nel run la riga **"Topic ntfy impostato: si"** (se vedi **NO**, aggiungi il secret `NTFY_TOPIC`). Le notifiche automatiche partono ogni 5 min tra le 06:00 e le 02:00 (ora italiana).
 
 Da questo momento puoi chiudere il PC: le notifiche continuano da GitHub.

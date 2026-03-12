@@ -6,7 +6,7 @@ cd "$(dirname "$0")/.."
 # Controllo ogni 5 min cosi possono arrivare 1 o 2 notifiche in un periodo di 10 min (intervallo random 5-10 min)
 INTERVALLO=300
 
-echo "Avvio invio notifiche: controllo ogni 5 min (finestra 08:00-23:00, circa 1-2 notifiche ogni 10 min). Ctrl+C per fermare."
+echo "Avvio invio notifiche: controllo ogni 5 min (finestra 06:00-02:00, circa 1-2 notifiche ogni 10 min). Ctrl+C per fermare."
 while true; do
   python3 main.py
   sleep "$INTERVALLO"

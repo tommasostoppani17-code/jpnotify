@@ -8,18 +8,31 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+# Carica .env in locale (GitHub Actions usa le variabili d'ambiente dei secret)
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).resolve().parent / ".env")
+except ImportError:
+    pass
+
 import config
 from logic import selezionatore
 from sender import notifica
 
 
 def _ora_in_finestra(ora, ora_inizio, ora_fine):
-    """Verifica se l'ora (datetime con timezone) è nella finestra ora_inizio--ora_fine (stringhe HH:MM)."""
+    """
+    Verifica se l'ora è nella finestra (HH:MM).
+    Se ora_fine < ora_inizio (es. 02:00 < 06:00), la finestra attraversa mezzanotte: 06:00-02:00.
+    """
     h_i, m_i = map(int, ora_inizio.split(":"))
     h_f, m_f = map(int, ora_fine.split(":"))
-    inizio = ora.replace(hour=h_i, minute=m_i, second=0, microsecond=0)
-    fine = ora.replace(hour=h_f, minute=m_f, second=0, microsecond=0)
-    return inizio <= ora <= fine
+    inizio_oggi = ora.replace(hour=h_i, minute=m_i, second=0, microsecond=0)
+    fine_oggi = ora.replace(hour=h_f, minute=m_f, second=0, microsecond=0)
+    if h_f > h_i or (h_f == h_i and m_f > m_i):
+        return inizio_oggi <= ora <= fine_oggi
+    # Finestra a cavallo di mezzanotte (es. 06:00 - 02:00): in finestra se ora >= 06:00 O ora < 02:00
+    return ora >= inizio_oggi or ora < fine_oggi
 
 
 def _leggi_prossimo_invio(percorso):
@@ -44,24 +57,31 @@ def _scrivi_prossimo_invio(percorso, dt):
 def _calcola_prossimo_istante(fuso_orario, ora_inizio, ora_fine, min_minuti, max_minuti):
     """
     Calcola il prossimo istante di invio: ora + intervallo casuale (min_max minuti).
-    Se cade dopo ora_fine, imposta al giorno dopo a ora_inizio + un po' di random.
+    Se la finestra supera mezzanotte (ora_fine < ora_inizio), "fine" è 02:00 (oggi o domani).
     """
     tz = ZoneInfo(fuso_orario)
     ora = datetime.now(tz)
+    h_i, m_i = map(int, ora_inizio.split(":"))
+    h_f, m_f = map(int, ora_fine.split(":"))
     minuti = random.randint(min_minuti, max_minuti)
     prossimo = ora + timedelta(minutes=minuti)
-    h_f, m_f = map(int, ora_fine.split(":"))
-    fine_oggi = ora.replace(hour=h_f, minute=m_f, second=0, microsecond=0)
-    if prossimo > fine_oggi:
-        h_i, m_i = map(int, ora_inizio.split(":"))
-        domani = (ora + timedelta(days=1)).replace(hour=h_i, minute=m_i, second=0, microsecond=0)
-        prossimo = domani + timedelta(minutes=random.randint(0, 30))
+    # Fine della finestra corrente: se siamo dopo le 06:00, fine = domani 02:00; altrimenti oggi 02:00
+    if ora >= ora.replace(hour=h_i, minute=m_i, second=0, microsecond=0):
+        fine_finestra = (ora + timedelta(days=1)).replace(hour=h_f, minute=m_f, second=0, microsecond=0)
+    else:
+        fine_finestra = ora.replace(hour=h_f, minute=m_f, second=0, microsecond=0)
+    if prossimo > fine_finestra:
+        # Prossimo invio = prossima apertura (06:00) + un po' di random
+        prossimo = ora.replace(hour=h_i, minute=m_i, second=0, microsecond=0)
+        if ora >= prossimo:
+            prossimo = prossimo + timedelta(days=1)
+        prossimo = prossimo + timedelta(minutes=random.randint(0, 30))
     return prossimo
 
 
 def _deve_inviare_ora(force=False):
     """
-    True se siamo nella finestra 08:00-23:00 e l'ora corrente è >= prossimo_invio.
+    True se siamo nella finestra 06:00-02:00 e l'ora corrente è >= prossimo_invio.
     Se prossimo_invio non c'è o è nel passato, considera "invia ora" se siamo in finestra.
     Con force=True (env FORCE_INVIO=1) invia subito ignorando orario e prossimo_invio (per test).
     """
@@ -97,8 +117,12 @@ def main():
     if not _deve_inviare_ora(force=force):
         return 0
 
-    # 2. Tipo notifica: di tanto in tanto "Ora del vocabolario Gen Z", altrimenti parola (dizionario o curiosità)
-    tipo = random.choice(["dizionario", "curiosita", "genz"])
+    # 2. Tipo notifica: priorità alla parola (significato + esempio) per imparare; curiosità e Gen Z ogni tanto
+    tipo = random.choices(
+        ["dizionario", "curiosita", "genz"],
+        weights=[65, 28, 7],  # 65% parola, 28% curiosità, 7% Gen Z
+        k=1,
+    )[0]
 
     if tipo == "genz":
         # Notifica breve Gen Z: carica vocabolario_genz, scegli una voce a caso, invia

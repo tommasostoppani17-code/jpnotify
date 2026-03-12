@@ -32,15 +32,17 @@ def genera_curiosita_con_gemini(voce, api_key):
     kanji = voce.get("kanji", "")
     lettura = voce.get("lettura", "")
     significato = voce.get("significato", "")
-    prompt = f"""Per la parola giapponese {kanji} ({lettura}), significato: {significato}.
-Scrivi in italiano UNA sola frase breve (massimo 120 caratteri) di curiosita: origine del kanji, uso storico, aneddoto, o perche si usa in certi contesti.
-Solo testo, niente emoji. Rispondi solo con la frase, senza virgolette o prefissi."""
+    prompt = f"""Parola giapponese: {kanji} ({lettura}), significato: {significato}.
+
+Scrivi UNA curiosità ad alto impatto in italiano: come per 実施 (Jisshi) e Genba Kanri — qualcosa che ribalta la prospettiva e porta in un mondo (significato dei kanji, filosofia, uso reale). Deve essere una chicca che cambia scenario in poche parole.
+
+Vincoli: massimo 120 caratteri, una o due frasi. Niente emoji, niente virgolette o prefissi. Solo la frase, per lettura passiva in una notifica."""
     try:
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel("gemini-1.5-flash")
         resp = model.generate_content(prompt)
         testo = (resp.text or "").strip()
-        return testo[:200] if testo else None
+        return testo[:150] if testo else None
     except Exception as e:
         print(f"  Errore Gemini per {kanji}: {e}", file=sys.stderr)
         return None

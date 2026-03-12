@@ -7,8 +7,8 @@ import requests
 def formatta_messaggio(voce, tipo="dizionario"):
     """
     Una notifica = solo dizionario O solo curiosita, mai entrambi.
-    Mai solo kanji: sempre kanji + lettura + translitterazione (romaji).
-    tipo: "dizionario" = parola (lettura - romaji), significato, esempio. "curiosita" = parola (lettura - romaji) + curiosita AI.
+    La traduzione (significato) c'è sempre: in parola è esplicita; in curiosità è sempre presente prima della chicca.
+    tipo: "dizionario" = parola, significato, esempio. "curiosita" = parola, significato, curiosità breve ad alto impatto.
     Restituisce (titolo, corpo).
     """
     kanji = voce.get("kanji", "")
@@ -22,10 +22,10 @@ def formatta_messaggio(voce, tipo="dizionario"):
     # Riga parola sempre con translitterazione: kanji (lettura - romaji)
     riga_parola = f"{kanji} ({lettura} - {romaji})" if (lettura or romaji) else kanji
 
-    # Titolo solo ASCII (evita errore encoding header HTTP)
+    # Curiosità: sempre parola + SIGNIFICATO (la traduzione ci deve essere sempre) + curiosità breve ad alto impatto
     if tipo == "curiosita" and curiosita:
         titolo = "Giapponese C1 - Curiosita"
-        corpo = f"{riga_parola}\n{curiosita}"
+        corpo = f"{riga_parola}\nSignificato: {significato}\n{curiosita}"
         return titolo, corpo.strip()
 
     # Parola del momento: sempre kanji + lettura + romaji, poi significato ed esempio

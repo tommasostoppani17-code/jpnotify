@@ -19,7 +19,7 @@ chmod +x scripts/avvia_invio_continuo.sh
 ./scripts/avvia_invio_continuo.sh
 ```
 
-Lo script lancia `main.py` ogni 5 minuti. Circa 1-2 notifiche ogni 10 min. Tieni il terminale aperto (Ctrl+C per fermare). Finestra 08:00-23:00 (ora italiana).
+Lo script lancia `main.py` ogni 5 minuti. Circa 1-2 notifiche ogni 10 min. Tieni il terminale aperto (Ctrl+C per fermare). Finestra 06:00-02:00 (ora italiana).
 
 ---
 
@@ -45,7 +45,7 @@ Esegui `crontab -e` e aggiungi (adatta il percorso se serve):
 */5 * * * * cd "/Users/tommaso/Desktop/Spaced Repetition" && /usr/bin/python3 main.py
 ```
 
-Salva e esci. Ogni 5 minuti il sistema esegue `main.py`; le notifiche partono solo se il Mac è acceso e sveglio (finestra 08:00-23:00).
+Salva e esci. Ogni 5 minuti il sistema esegue `main.py`; le notifiche partono solo se il Mac è acceso e sveglio (finestra 06:00-02:00).
 
 ---
 
@@ -57,7 +57,7 @@ Le notifiche partono anche a Mac spento, da GitHub.
 2. Nel repo: **Settings → Secrets and variables → Actions**. Aggiungi un secret:
    - Nome: `NTFY_TOPIC`  
    - Valore: il tuo topic ntfy (es. `mio_giapponese_extreme_8000`).
-3. Il workflow in `.github/workflows/invia-notifica.yml` è già configurato: parte **ogni 5 minuti**, esegue `main.py` e fa commit dello stato (vocabolario, prossimo invio, log). Circa 1–2 notifiche ogni 10 min, tra 08:00 e 23:00 (Europe/Rome).
+3. Il workflow in `.github/workflows/invia-notifica.yml` è già configurato: parte **ogni 5 minuti**, esegue `main.py` e fa commit dello stato (vocabolario, prossimo invio, log). Circa 1–2 notifiche ogni 10 min, tra 06:00 e 02:00 (Europe/Rome).
 
 Non serve fare altro: le notifiche arrivano a orari irregolari. Per l’icona personalizzata imposta anche il secret `ICONA_NOTIFICA_URL` (URL raw di `assets/icona_notifica.png` su GitHub).
 
@@ -66,4 +66,4 @@ Non serve fare altro: le notifiche arrivano a orari irregolari. Per l’icona pe
 ## Verifica
 
 - Controlla che nell’app ntfy sull’iPhone sei iscritto allo **stesso topic** usato dallo script (in `config.py` o in `.env`: `NTFY_TOPIC`).
-- Per una prova immediata: dalla cartella del progetto esegui `python3 main.py`. Se sei nella fascia oraria 08:00–23:00, parte una notifica subito.
+- Per una prova immediata: dalla cartella del progetto esegui `python3 main.py`. Se sei nella fascia oraria 06:00–02:00, parte una notifica subito.

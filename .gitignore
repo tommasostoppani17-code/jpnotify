@@ -1,8 +1,10 @@
 .env
-__pycache__/
+.env.local
 *.pyc
+__pycache__/
 .Python
 *.egg-info/
 .venv/
 venv/
 data/invio_continuo.log
+.DS_Store

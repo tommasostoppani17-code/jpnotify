@@ -4,36 +4,42 @@
 import os
 from pathlib import Path
 
+__version__ = "1.0.0"
+
 # Directory base del progetto (dove si trova config.py)
 BASE_DIR = Path(__file__).resolve().parent
 
 # Topic ntfy: chi si iscrive nell'app riceve le notifiche. Preferire .env per non committere.
-NTFY_TOPIC = os.getenv("NTFY_TOPIC", "mio_giapponese_extreme_8000")
+_DEFAULT_TOPIC = "mio_giapponese_extreme_8000"
+NTFY_TOPIC = (os.getenv("NTFY_TOPIC") or _DEFAULT_TOPIC).strip() or _DEFAULT_TOPIC
 
-# Icona notifica: URL pubblico (pagoda giapponese). Se vuoto, usa quella del repo su GitHub.
-ICONA_NOTIFICA_URL = os.getenv(
-    "ICONA_NOTIFICA_URL",
-    "https://raw.githubusercontent.com/tommasostoppani17-code/jpnotify/main/assets/icona_notifica.png",
-).strip()
+# Icona notifica personalizzata: URL pubblico della TUA immagine (PNG/JPG). ntfy la mostra al posto di quella grigia.
+# Imposta in .env (locale) o nel secret ICONA_NOTIFICA_URL (GitHub). Vuoto = usa icona predefinita del repo.
+_DEFAULT_ICONA = "https://raw.githubusercontent.com/tommasostoppani17-code/jpnotify/main/assets/icona_notifica.png"
+ICONA_NOTIFICA_URL = (os.getenv("ICONA_NOTIFICA_URL") or _DEFAULT_ICONA).strip() or _DEFAULT_ICONA
+
+# Cartella dati (creata automaticamente se mancante)
+DATA_DIR = BASE_DIR / "data"
+DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 # Percorso del file vocabolario
-PERCORSO_VOCABOLARIO = BASE_DIR / "data" / "vocabolario.json"
+PERCORSO_VOCABOLARIO = DATA_DIR / "vocabolario.json"
 
 # Vocabolario Gen Z (frasi slang, notifiche brevi "Ora del vocabolario Gen Z")
-PERCORSO_VOCABOLARIO_GENZ = BASE_DIR / "data" / "vocabolario_genz.json"
+PERCORSO_VOCABOLARIO_GENZ = DATA_DIR / "vocabolario_genz.json"
 
 # File in cui persistere il prossimo istante di invio (per intervalli irregolari)
-PERCORSO_PROSSIMO_INVIO = BASE_DIR / "data" / "prossimo_invio.txt"
+PERCORSO_PROSSIMO_INVIO = DATA_DIR / "prossimo_invio.txt"
 
 # File log opzionale per statistiche a fine settimana
-PERCORSO_LOG = BASE_DIR / "data" / "log.txt"
+PERCORSO_LOG = DATA_DIR / "log.txt"
 
-# Fuso orario per "questa settimana" e finestra 08:00-23:00
+# Fuso orario e finestra: 06:00-02:00 (ora italiana, fino alle 2 di notte)
 FUSO_ORARIO = "Europe/Rome"
 
-# Finestra giornaliera: invio solo tra ora_inizio e ora_fine
-ORA_INIZIO = "08:00"
-ORA_FINE = "23:00"
+# Finestra giornaliera: invio dalle 6:00 alle 2:00 del mattino dopo (finestra che attraversa mezzanotte)
+ORA_INIZIO = "06:00"
+ORA_FINE = "02:00"
 
 # Circa ogni 10 min una notifica, a volte due in periodi random (intervallo 5-10 min tra un invio e l'altro)
 NOTIFICHE_PER_GIORNO_MIN = 50

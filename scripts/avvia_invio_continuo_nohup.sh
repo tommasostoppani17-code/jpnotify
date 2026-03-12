@@ -10,4 +10,4 @@ echo "Avvio in background. Log: $LOG"
 echo "Per fermare: pkill -f 'python3 main.py' oppure kill il processo sotto."
 nohup bash -c "while true; do python3 main.py >> $LOG 2>&1; sleep $INTERVALLO; done" &
 echo "PID: $!"
-echo "Controllo ogni 5 min, finestra 08:00-23:00. Per vedere il log: tail -f $LOG"
+echo "Controllo ogni 5 min, finestra 06:00-02:00. Per vedere il log: tail -f $LOG"
