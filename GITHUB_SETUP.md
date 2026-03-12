@@ -21,7 +21,12 @@ Segui questi passi una sola volta. Dopo, le notifiche partono da GitHub ogni 5 m
    Valore: il tuo topic ntfy (es. `mio_giapponese_extreme_8000` – quello che usi nell’app ntfy sull’iPhone).
 4. Salva.
 
-(Opzionale: per l’icona personalizzata, aggiungi anche il secret `ICONA_NOTIFICA_URL` con l’URL raw di `assets/icona_notifica.png` dopo il push.)
+**Icona personalizzata (pagoda giapponese su iPhone/MacBook):**  
+Aggiungi un altro secret: nome `ICONA_NOTIFICA_URL`, valore:
+```
+https://raw.githubusercontent.com/tommasostoppani17-code/jpnotify/main/assets/icona_notifica.png
+```
+Così ntfy userà questa icona al posto di quella grigia predefinita.
 
 ---
 
