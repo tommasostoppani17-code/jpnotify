@@ -1,6 +1,8 @@
 # Setup GitHub: notifiche anche a PC spento
 
-Segui questi passi una sola volta. Dopo, le notifiche partono da GitHub ogni 5 min (08:00-23:00, Europe/Rome).
+**Le notifiche partono da GitHub**, non dal tuo computer. Puoi **chiudere Cursor**, **spegnere il PC** e le notifiche continuano lo stesso (08:00–23:00 ora italiana, ogni 5–10 min).
+
+Segui questi passi una sola volta. Dopo, il workflow gira da solo ogni 5 minuti.
 
 ---
 
