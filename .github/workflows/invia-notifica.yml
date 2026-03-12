@@ -1,5 +1,5 @@
-# Automazione: ogni 10 minuti esegue main.py; se è ora di inviare, invia (con curiosita) e fa commit dello stato.
-# Gira a computer spento. Intervallo tra notifiche 5-10 min (a volte 1, a volte 2 ogni 10 min).
+# Automazione: ogni 5 min esegue main.py; se è ora di inviare, invia e fa commit dello stato.
+# Gira a computer spento. Per test: Run workflow → "Invia subito (test)" = una notifica immediata.
 
 name: Invia notifica vocabolario
 
@@ -8,9 +8,14 @@ permissions:
 
 on:
   schedule:
-    # Ogni 5 min per permettere 1 o 2 notifiche ogni 10 min (intervallo random 5-10 min)
     - cron: "*/5 * * * *"
   workflow_dispatch:
+    inputs:
+      invia_subito:
+        description: "Invia una notifica subito (test)"
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   invia:
@@ -29,12 +34,30 @@ jobs:
       - name: Installa dipendenze
         run: pip install -r requirements.txt
 
+      - name: Debug ora e stato
+        run: |
+          python -c "
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+          tz = ZoneInfo('Europe/Rome')
+          now = datetime.now(tz)
+          print('Ora (Rome):', now.isoformat())
+          try:
+              p = open('data/prossimo_invio.txt').read().strip()
+              print('Prossimo invio (file):', p)
+          except Exception as e:
+              print('Prossimo invio: (file assente)', e)
+          "
+          echo "Topic ntfy impostato: $([ -n \"${{ secrets.NTFY_TOPIC }}\" ] && echo si || echo NO - aggiungi secret NTFY_TOPIC)"
+
       - name: Esegui main
         env:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
           ICONA_NOTIFICA_URL: ${{ secrets.ICONA_NOTIFICA_URL }}
-        run: python main.py
-        continue-on-error: true
+          FORCE_INVIO: ${{ inputs.invia_subito && '1' || '' }}
+        run: |
+          python main.py
+          echo "Exit code main.py: $?"
 
       - name: Commit e push stato
         run: |

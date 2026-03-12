@@ -6,8 +6,9 @@ import requests
 
 def formatta_messaggio(voce, tipo="dizionario"):
     """
-    Una notifica = solo dizionario O solo curiosita, mai entrambi (cosi si legge tutto).
-    tipo: "dizionario" = parola, lettura, significato, esempio. "curiosita" = solo la curiosita (e il kanji per contesto).
+    Una notifica = solo dizionario O solo curiosita, mai entrambi.
+    Mai solo kanji: sempre kanji + lettura + translitterazione (romaji).
+    tipo: "dizionario" = parola (lettura - romaji), significato, esempio. "curiosita" = parola (lettura - romaji) + curiosita AI.
     Restituisce (titolo, corpo).
     """
     kanji = voce.get("kanji", "")
@@ -18,19 +19,32 @@ def formatta_messaggio(voce, tipo="dizionario"):
     esempio_trad = voce.get("esempio_traduzione", "")
     curiosita = (voce.get("curiosita") or "").strip()
 
-    # Titolo solo ASCII (evita errore encoding header HTTP); kanji nel corpo
+    # Riga parola sempre con translitterazione: kanji (lettura - romaji)
+    riga_parola = f"{kanji} ({lettura} - {romaji})" if (lettura or romaji) else kanji
+
+    # Titolo solo ASCII (evita errore encoding header HTTP)
     if tipo == "curiosita" and curiosita:
         titolo = "Giapponese C1 - Curiosita"
-        corpo = f"{kanji}\n{curiosita}"
+        corpo = f"{riga_parola}\n{curiosita}"
         return titolo, corpo.strip()
 
-    # dizionario: solo parola, significato, esempio (nessuna curiosita)
-    titolo = "Giapponese C1 - Parola"
-    riga_parola = f"{kanji} - {lettura} ({romaji})"
+    # Parola del momento: sempre kanji + lettura + romaji, poi significato ed esempio
+    titolo = "Giapponese C1 - Parola del momento"
     corpo = riga_parola + "\nSignificato: " + significato
     if esempio or esempio_trad:
         corpo += "\nEsempio: " + (esempio or "") + (" " + esempio_trad if esempio_trad else "")
     return titolo, corpo.strip()
+
+
+def formatta_messaggio_genz(voce_genz):
+    """
+    Notifica breve per il vocabolario Gen Z (slang). Restituisce (titolo, corpo).
+    """
+    frase = voce_genz.get("frase", "")
+    significato = voce_genz.get("significato", "")
+    titolo = "Giapponese C1 - Ora del vocabolario Gen Z"
+    corpo = f"{frase}\n{significato}".strip()
+    return titolo, corpo
 
 
 def invia_notifica(titolo, corpo, topic, url_icona=None):

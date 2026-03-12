@@ -10,12 +10,17 @@ BASE_DIR = Path(__file__).resolve().parent
 # Topic ntfy: chi si iscrive nell'app riceve le notifiche. Preferire .env per non committere.
 NTFY_TOPIC = os.getenv("NTFY_TOPIC", "mio_giapponese_extreme_8000")
 
-# Icona notifica: URL pubblico dell'immagine (es. raw GitHub dopo push). Se vuoto, ntfy usa la sua icona.
-# Esempio dopo push su GitHub: https://raw.githubusercontent.com/TUO_USER/TUO_REPO/main/assets/icona_notifica.png
-ICONA_NOTIFICA_URL = os.getenv("ICONA_NOTIFICA_URL", "")
+# Icona notifica: URL pubblico (pagoda giapponese). Se vuoto, usa quella del repo su GitHub.
+ICONA_NOTIFICA_URL = os.getenv(
+    "ICONA_NOTIFICA_URL",
+    "https://raw.githubusercontent.com/tommasostoppani17-code/jpnotify/main/assets/icona_notifica.png",
+).strip()
 
 # Percorso del file vocabolario
 PERCORSO_VOCABOLARIO = BASE_DIR / "data" / "vocabolario.json"
+
+# Vocabolario Gen Z (frasi slang, notifiche brevi "Ora del vocabolario Gen Z")
+PERCORSO_VOCABOLARIO_GENZ = BASE_DIR / "data" / "vocabolario_genz.json"
 
 # File in cui persistere il prossimo istante di invio (per intervalli irregolari)
 PERCORSO_PROSSIMO_INVIO = BASE_DIR / "data" / "prossimo_invio.txt"

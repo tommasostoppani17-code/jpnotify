@@ -45,9 +45,13 @@ Sostituisci `TUO_USERNAME` e `TUO_REPO` con i tuoi (es. `mionome` e `spaced-repe
 
 ---
 
-## 4. Verifica
+## 4. Verifica e primo test
 
-- Nella repo: **Actions** → dovresti vedere il workflow "Invia notifica vocabolario". Parte ogni 5 min; puoi anche lanciarlo a mano con **Run workflow**.
-- Sul telefono: tieni l’app ntfy aperta sul topic scelto. Le notifiche arrivano a orari irregolari tra 08:00 e 23:00 (ora italiana).
+1. **Actions** → workflow **"Invia notifica vocabolario"**.
+2. Clicca **Run workflow** (dropdown) → spunta **"Invia subito (test)"** → **Run workflow**.
+3. Quando il run è finito (icona verde), apri il run e nella step **"Esegui main"** controlla l’exit code: `0` = notifica inviata, nessun output dopo = non era ancora ora (normale con lo schedule).
+4. Sul telefono/MacBook: apri l’app ntfy e iscriviti al **topic** uguale al valore che hai messo in `NTFY_TOPIC` (es. `mio_giapponese_extreme_8000`). Dovresti ricevere una notifica entro pochi secondi dal run con "Invia subito" attivo.
+
+Se non arriva nulla: controlla nel run la riga **"Topic ntfy impostato: si"** (se vedi **NO**, aggiungi il secret `NTFY_TOPIC`). Le notifiche automatiche partono ogni 5 min tra le 08:00 e le 23:00 (ora italiana).
 
 Da questo momento puoi chiudere il PC: le notifiche continuano da GitHub.

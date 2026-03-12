@@ -1,6 +1,7 @@
 # Orchestratore: legge config, controlla se è ora di inviare, carica dati, filtra, pool, sceglie, formatta, invia, aggiorna stato.
 # Flusso: Leggi -> Filtra -> Formatta -> Invia (piano sezione 6). Gira in cloud (GitHub Actions) o in locale.
 
+import json
 import random
 import sys
 from datetime import datetime, timedelta
@@ -58,11 +59,14 @@ def _calcola_prossimo_istante(fuso_orario, ora_inizio, ora_fine, min_minuti, max
     return prossimo
 
 
-def _deve_inviare_ora():
+def _deve_inviare_ora(force=False):
     """
     True se siamo nella finestra 08:00-23:00 e l'ora corrente è >= prossimo_invio.
     Se prossimo_invio non c'è o è nel passato, considera "invia ora" se siamo in finestra.
+    Con force=True (env FORCE_INVIO=1) invia subito ignorando orario e prossimo_invio (per test).
     """
+    if force:
+        return True
     tz = ZoneInfo(config.FUSO_ORARIO)
     ora = datetime.now(tz)
     if not _ora_in_finestra(ora, config.ORA_INIZIO, config.ORA_FINE):
@@ -87,11 +91,45 @@ def _scrivi_log(riga):
 
 
 def main():
-    # 1. Controllo scheduler: invio solo se siamo in finestra e e ora di inviare
-    if not _deve_inviare_ora():
+    import os
+    force = os.getenv("FORCE_INVIO", "").strip() in ("1", "true", "yes")
+    # 1. Controllo scheduler: invio solo se siamo in finestra e e ora di inviare (o FORCE_INVIO per test)
+    if not _deve_inviare_ora(force=force):
         return 0
 
-    # 2. Carica e filtra
+    # 2. Tipo notifica: di tanto in tanto "Ora del vocabolario Gen Z", altrimenti parola (dizionario o curiosità)
+    tipo = random.choice(["dizionario", "curiosita", "genz"])
+
+    if tipo == "genz":
+        # Notifica breve Gen Z: carica vocabolario_genz, scegli una voce a caso, invia
+        try:
+            genz_data = json.loads(config.PERCORSO_VOCABOLARIO_GENZ.read_text(encoding="utf-8"))
+        except (FileNotFoundError, ValueError) as e:
+            print(f"Errore caricamento vocabolario Gen Z: {e}", file=sys.stderr)
+            tipo = "dizionario"  # fallback
+            genz_data = None
+        if genz_data:
+            voce_genz = random.choice(genz_data)
+            titolo, corpo = notifica.formatta_messaggio_genz(voce_genz)
+            try:
+                notifica.invia_notifica(titolo, corpo, config.NTFY_TOPIC, url_icona=config.ICONA_NOTIFICA_URL or None)
+            except Exception as e:
+                print(f"Errore invio notifica: {e}", file=sys.stderr)
+                return 1
+            prossimo = _calcola_prossimo_istante(
+                config.FUSO_ORARIO,
+                config.ORA_INIZIO,
+                config.ORA_FINE,
+                config.INTERVALLO_MIN_MINUTI,
+                config.INTERVALLO_MAX_MINUTI,
+            )
+            _scrivi_prossimo_invio(config.PERCORSO_PROSSIMO_INVIO, prossimo)
+            _scrivi_log(f"{datetime.now(ZoneInfo(config.FUSO_ORARIO)).isoformat()} genz frase={voce_genz.get('frase', '')[:30]}")
+            print("Notifica Gen Z inviata:", voce_genz.get("frase", "")[:40])
+            return 0
+        # se genz_data vuoto o errore, continua sotto con parola
+
+    # 3. Carica e filtra vocabolario N1
     try:
         vocaboli = selezionatore.carica_vocaboli(config.PERCORSO_VOCABOLARIO)
     except (FileNotFoundError, ValueError) as e:
@@ -103,7 +141,7 @@ def main():
         print("Nessun vocabolo per il livello configurato.", file=sys.stderr)
         return 1
 
-    # 3. Blocco e pool attivo
+    # 4. Blocco e pool attivo
     blocco = selezionatore.calcola_blocco_corrente(config.FUSO_ORARIO)
     pool_attivo = selezionatore.costruisci_pool_attivo(
         vocaboli_filtrati,
@@ -115,14 +153,13 @@ def main():
         print("Pool attivo vuoto.", file=sys.stderr)
         return 1
 
-    # 4. Scegli parola
+    # 5. Scegli parola
     parola = selezionatore.scegli_parola(pool_attivo, config.MAX_RIPETIZIONI_SETTIMANA)
     if not parola:
         print("Nessuna parola disponibile nel pool.", file=sys.stderr)
         return 1
 
-    # 5. Formatta e invia: una notifica = solo dizionario O solo curiosita (scelta casuale)
-    tipo = random.choice(["dizionario", "curiosita"])
+    # 6. Formatta e invia: dizionario o curiosità (sempre con kanji + translitterazione)
     if tipo == "curiosita" and not (parola.get("curiosita") or "").strip():
         tipo = "dizionario"
     titolo, corpo = notifica.formatta_messaggio(parola, tipo=tipo)
@@ -132,7 +169,7 @@ def main():
         print(f"Errore invio notifica: {e}", file=sys.stderr)
         return 1
 
-    # 6. Aggiorna contatori e prossimo istante
+    # 7. Aggiorna contatori e prossimo istante
     selezionatore.aggiorna_contatori(
         config.PERCORSO_VOCABOLARIO,
         parola["id"],
@@ -147,7 +184,7 @@ def main():
     )
     _scrivi_prossimo_invio(config.PERCORSO_PROSSIMO_INVIO, prossimo)
 
-    # 7. Log opzionale
+    # 8. Log opzionale
     riga_log = f"{datetime.now(ZoneInfo(config.FUSO_ORARIO)).isoformat()} id={parola['id']} kanji={parola.get('kanji', '')}"
     _scrivi_log(riga_log)
 
