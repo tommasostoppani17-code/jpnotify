@@ -1,0 +1,72 @@
+[
+  {
+    "id": "1",
+    "kanji": "把握",
+    "lettura": "はあく",
+    "romaji": "haaku",
+    "significato": "Afferrare, comprendere appieno.",
+    "esempio": "彼は現状を正確に把握している。",
+    "esempio_traduzione": "Lui ha colto esattamente la situazione attuale.",
+    "curiosita": "il kanji 把 (tenere in mano) e 握 (stringere) insieme esprimono l'idea di afferrare con precisione; in ambito aziendale si usa per \"avere una visione chiara della situazione\".",
+    "livello": "N1",
+    "id_blocco": 1,
+    "ultima_visualizzazione": "2026-03-12T12:49:49",
+    "volte_questa_settimana": 3
+  },
+  {
+    "id": "2",
+    "kanji": "対応",
+    "lettura": "たいおう",
+    "romaji": "taiou",
+    "significato": "Rispondere, affrontare; corrispondenza.",
+    "esempio": "お客様の要望に対応する。",
+    "esempio_traduzione": "Rispondere alle richieste del cliente.",
+    "curiosita": "対 significa \"coppia, corrispondere\" e 応 \"rispondere\"; insieme indicano la risposta adeguata a una richiesta, molto usata nel linguaggio business e nel customer service.",
+    "livello": "N1",
+    "id_blocco": 1,
+    "ultima_visualizzazione": "2026-03-12T19:10:38",
+    "volte_questa_settimana": 2
+  },
+  {
+    "id": "3",
+    "kanji": "実施",
+    "lettura": "じっし",
+    "romaji": "jisshi",
+    "significato": "Eseguire, mettere in pratica.",
+    "curiosita": "実 è \"realtà, frutto\" e 施 \"applicare\"; insieme indicano l'applicazione concreta di una norma o di un piano, molto usato nei comunicati ufficiali.",
+    "esempio": "新制度を来月から実施する。",
+    "esempio_traduzione": "La nuova normativa entrerà in vigore dal prossimo mese.",
+    "livello": "N1",
+    "id_blocco": 1,
+    "ultima_visualizzazione": null,
+    "volte_questa_settimana": 0
+  },
+  {
+    "id": "4",
+    "kanji": "膨大",
+    "lettura": "ぼうだい",
+    "romaji": "boudai",
+    "significato": "Enorme, vasto (quantità).",
+    "esempio": "膨大な資料を処理する。",
+    "esempio_traduzione": "Elaborare una quantità enorme di documenti.",
+    "curiosita": "膨 (gonfiare, espandere) e 大 (grande) danno l'idea di qualcosa che si espande fino a diventare enorme; usato spesso per dati o documenti in quantità enorme.",
+    "livello": "N1",
+    "id_blocco": 1,
+    "ultima_visualizzazione": "2026-03-12T19:10:32",
+    "volte_questa_settimana": 2
+  },
+  {
+    "id": "5",
+    "kanji": "維持",
+    "lettura": "いじ",
+    "romaji": "iji",
+    "significato": "Mantenere, preservare.",
+    "curiosita": "維 significa \"mantenere in ordine\" e 持 \"tenere\"; in ambito legale e aziendale indica il mantenimento dello status quo o della qualita nel tempo.",
+    "esempio": "品質を維持することが大切だ。",
+    "esempio_traduzione": "È importante mantenere la qualità.",
+    "livello": "N1",
+    "id_blocco": 1,
+    "ultima_visualizzazione": "2026-03-12T19:10:35",
+    "volte_questa_settimana": 3
+  }
+]
