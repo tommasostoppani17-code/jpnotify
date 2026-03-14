@@ -21,10 +21,11 @@ Non devi essere esperto di programmazione: basta seguire i passi sotto.
 
 ## Cosa ti serve
 
-1. **Un telefono** (iPhone o Android) e/o **un Mac** (opzionale, per le notifiche su desktop).
+1. **Un telefono** (iPhone o Android) e/o **un Mac** (le notifiche possono arrivare su entrambi, vedi sotto).
 2. **L’app ntfy** (gratuita) per ricevere le notifiche.  
-   - Scaricala dall’App Store (iPhone) o da Google Play (Android). Su Mac puoi usare l’app ntfy se la usi.  
-   - ntfy è un servizio di notifiche push: tu ti “iscrivi” a un **topic** (un nome segreto che scegli tu) e chiunque conosca quel topic può inviarti messaggi. Qui il progetto invia le parole proprio a quel topic.
+   - **iPhone/Android**: App Store o Google Play.  
+   - **MacBook**: stessa app ntfy (App Store su Mac) oppure da [ntfy.sh](https://ntfy.sh) — apri l’app, iscriviti allo **stesso topic** che usi sul telefono: le notifiche (con la stessa icona personalizzata) compaiono anche su Mac.  
+   - ntfy è un servizio push: ti “iscrivi” a un **topic** (un nome segreto) e il progetto invia le parole a quel topic; tutti i dispositivi iscritti ricevono la notifica.
 3. **Un account GitHub** (gratuito) se vuoi che le notifiche partano **anche a PC spento**. Se vuoi solo provare sul PC, GitHub non è obbligatorio.
 4. **Python 3** sul computer solo se vuoi far girare il progetto in locale (vedi sotto).
 
@@ -141,8 +142,9 @@ Per i dettagli passo-passo vedi **GITHUB_SETUP.md**.
 │   └── notifica.py       # Formatta il messaggio (parola / curiosità / Gen Z) e lo invia a ntfy
 │
 ├── scripts/
-│   ├── arricchisci_curiosita.py  # Script una tantum: aggiunge "curiosità" alle voci del vocabolario con Gemini (serve GEMINI_API_KEY)
-│   ├── avvia_invio_continuo.sh   # Lancia main.py ogni 5 min in locale (PC acceso)
+│   ├── genera_vocabolario_8000.py  # Genera data/vocabolario.json con 8000 parole da JLPT N1-N5 (open-anki-jlpt-decks)
+│   ├── arricchisci_curiosita.py    # Aggiunge "curiosità" alle voci con Gemini (GEMINI_API_KEY)
+│   ├── avvia_invio_continuo.sh    # Lancia main.py ogni 5 min in locale (PC acceso)
 │   └── avvia_invio_continuo_nohup.sh  # Come sopra, in background
 │
 ├── .github/workflows/
@@ -167,10 +169,10 @@ Per i dettagli passo-passo vedi **GITHUB_SETUP.md**.
 ## Personalizzazione
 
 - **Topic ntfy**  
-  In `.env` (locale) o nel secret `NTFY_TOPIC` (GitHub): il nome del “canale” a cui sei iscritto nell’app ntfy. Deve essere uguale a quello che inserisci in ntfy.
+  In `.env` (locale) o nel secret `NTFY_TOPIC` (GitHub): il nome del “canale” a cui sei iscritto nell’app ntfy. Deve essere uguale su tutti i dispositivi (iPhone, MacBook, ecc.).
 
-- **Icona delle notifiche**  
-  In `.env` o nel secret `ICONA_NOTIFICA_URL`: metti l’**URL pubblico** di un’immagine (PNG/JPG). Es. URL raw di un’immagine su GitHub, o link da Imgur. Se non lo imposti, si usa l’icona nel repo (`assets/icona_notifica.png`).
+- **Icona / miniatura delle notifiche (al posto di quella standard ntfy)**  
+  In `.env` o nel secret `ICONA_NOTIFICA_URL`: metti l’**URL pubblico** di un’immagine (PNG/JPG). Quella immagine viene usata come miniatura della notifica **su iPhone e su MacBook** (e ovunque tu abbia ntfy aperto con quel topic). Se non lo imposti, si usa l’icona predefinita del repo (`assets/icona_notifica.png`). Es.: URL raw su GitHub, o link da Imgur.
 
 - **Orari**  
   In `config.py`: `ORA_INIZIO` e `ORA_FINE`. Di default: 06:00–02:00 (ora italiana). La finestra “attraversa” la mezzanotte (da 6 del mattino alle 2 di notte).
@@ -190,8 +192,14 @@ Per i dettagli passo-passo vedi **GITHUB_SETUP.md**.
 **Posso usare solo il telefono?**  
 Sì. Basta installare ntfy, iscriversi al topic e (se vuoi notifiche a PC spento) configurare GitHub come in **GITHUB_SETUP.md**. Non serve tenere aperto il PC.
 
+**Come faccio comparire le notifiche anche su MacBook?**  
+Installa l’app ntfy su Mac (App Store o da ntfy.sh), aprila e iscriviti allo **stesso topic** che usi sull’iPhone. Le notifiche (con la stessa icona personalizzata, non quella standard ntfy) arrivano su tutti i dispositivi iscritti.
+
 **Da dove vengono le 8000 parole?**  
-Stanno (o staranno) in `data/vocabolario.json`. Il progetto non include un vocabolario completo: puoi popolarlo tu, usare dati open o generare le voci con altri strumenti. Lo script `arricchisci_curiosita.py` serve solo ad aggiungere il campo “curiosità” alle voci già presenti usando Gemini.
+Il file `data/vocabolario.json` è generato con **scripts/genera_vocabolario_8000.py**: scarica i vocaboli JLPT N1–N5 dal progetto [open-anki-jlpt-decks](https://github.com/jamsinclair/open-anki-jlpt-decks), li converte nel formato dell’app (con romaji) e produce 8000 voci in 160 blocchi. I **significati** sono in inglese (fonte originale); puoi lasciarli così o tradurli. Lo script **arricchisci_curiosita.py** aggiunge il campo “curiosità” in italiano con Gemini.
+
+**Vedo sempre le stesse parole e troppo poco spesso.**  
+Se nel vocabolario hai poche voci (es. 5–10), è normale che si ripetano: il sistema sceglie dal pool del blocco. Aggiungi più parole a `data/vocabolario.json` (stesso schema delle esistenti) per avere più varietà. Le notifiche sono state rese più frequenti (circa ogni 3–6 minuti invece di 5–10); in `config.py` puoi modificare `INTERVALLO_MIN_MINUTI` e `INTERVALLO_MAX_MINUTI` per regolare ancora.
 
 **Cosa significa “spaced repetition” qui?**  
 Il sistema non è un’app tipo Anki: ogni settimana ha un blocco “nuovo” (50 parole) e ripropone una parte delle parole dei blocchi precedenti (20% del pool). Così le parole ti riappaiono nel tempo senza che tu debba schedulare le ripetizioni a mano.

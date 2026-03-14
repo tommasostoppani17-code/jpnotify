@@ -49,13 +49,15 @@ def formatta_messaggio_genz(voce_genz):
 
 def invia_notifica(titolo, corpo, topic, url_icona=None):
     """
-    Invia la notifica al topic ntfy. Lo slash prima del topic è obbligatorio.
-    Se url_icona è un URL pubblico (PNG/JPG), ntfy la usa come icona al posto di quella grigia.
+    Invia la notifica al topic ntfy. Icona personalizzata (URL pubblico PNG/JPG) mostrata
+    su iPhone e MacBook al posto della miniatura standard ntfy. Se url_icona è None o vuoto
+    non si invia l'header Icon (ntfy userà la sua icona grigia).
     """
     url = "https://ntfy.sh/" + topic.strip("/")
     headers = {"Title": titolo, "Tags": "jp"}
-    if url_icona and url_icona.strip().startswith("http"):
-        headers["Icon"] = url_icona.strip()
+    icon_url = (url_icona or "").strip()
+    if icon_url.startswith("http"):
+        headers["Icon"] = icon_url
     response = requests.post(
         url,
         data=corpo.encode("utf-8"),

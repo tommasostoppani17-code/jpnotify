@@ -23,9 +23,8 @@ Segui questi passi una sola volta. Dopo, il workflow gira da solo ogni 5 minuti.
    Valore: il tuo topic ntfy (es. `mio_giapponese_extreme_8000` – quello che usi nell’app ntfy sull’iPhone).
 4. Salva.
 
-**Icona notifiche personalizzata:**  
-Aggiungi il secret `ICONA_NOTIFICA_URL` con l’**URL pubblico della tua immagine** (PNG/JPG). ntfy la userà per tutte le notifiche.  
-Esempi: URL raw di un’immagine su GitHub, link da Imgur o da un tuo sito. Se non lo imposti, si usa l’icona del repo (pagoda).
+**Icona / miniatura (al posto di quella standard ntfy):**  
+Aggiungi il secret `ICONA_NOTIFICA_URL` con l’**URL pubblico della tua immagine** (PNG/JPG). ntfy la userà come miniatura delle notifiche **su iPhone e su MacBook**. Se non lo imposti, si usa l’icona del repo (pagoda).
 ```
 https://raw.githubusercontent.com/tommasostoppani17-code/jpnotify/main/assets/icona_notifica.png
 ```

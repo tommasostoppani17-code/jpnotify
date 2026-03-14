@@ -27,7 +27,9 @@ def carica_vocaboli(percorso):
 
 
 def filtra_per_livello(vocaboli, livello):
-    """Restituisce solo le voci con livello uguale al parametro (es. N1)."""
+    """Restituisce le voci per livello: 'all' = tutte (N1-N5), altrimenti solo quel livello (es. N1)."""
+    if not livello or str(livello).strip().lower() == "all":
+        return list(vocaboli)
     return [v for v in vocaboli if v.get("livello") == livello]
 
 
@@ -116,9 +118,13 @@ def scegli_parola(pool_attivo, max_ripetizioni_settimana):
 
     candidate.sort(key=chiave)
 
-    # Prendi le prime N (es. 10) più "da ripassare" e scegli a caso tra quelle per non essere sempre uguale
-    n = min(10, len(candidate))
-    scelta = random.choice(candidate[:n])
+    # Ventaglio più largo: prendi fino a metà pool (o almeno 20) tra le più "da ripassare", così non escono sempre le stesse.
+    # A volte (20%) scegli del tutto a caso nel pool per spezzare il pattern.
+    if random.random() < 0.20 and len(candidate) > 1:
+        scelta = random.choice(candidate)
+    else:
+        n = max(1, min(len(candidate), max(20, len(candidate) // 2)))
+        scelta = random.choice(candidate[:n])
     return scelta
 
 

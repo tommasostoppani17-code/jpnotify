@@ -45,12 +45,12 @@ ORA_FINE = "02:00"
 NOTIFICHE_PER_GIORNO_MIN = 50
 NOTIFICHE_PER_GIORNO_MAX = 90
 
-# Intervallo casuale in minuti tra un invio e il prossimo: 5-10 min (puo arrivare 1 o 2 ogni 10 min)
-INTERVALLO_MIN_MINUTI = 5
-INTERVALLO_MAX_MINUTI = 10
+# Intervallo in minuti tra un invio e il prossimo: più breve = notifiche più frequenti
+INTERVALLO_MIN_MINUTI = 3
+INTERVALLO_MAX_MINUTI = 6
 
-# Livello vocaboli da usare (N1 = C1)
-LIVELLO_VOCABOLI = "N1"
+# Livello vocaboli: "all" = tutte le 8000 (N1-N5), "N1" = solo N1, ecc.
+LIVELLO_VOCABOLI = "all"
 
 # Un blocco a settimana, 50 parole per blocco. 160 blocchi x 50 = 8000 parole totali (spaced repetition)
 PAROLE_PER_BLOCCO = 50
